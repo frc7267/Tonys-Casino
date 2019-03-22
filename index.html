@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <title>Tony's Casino</title>
+</head>
+
+<body>
+
+    <div id="toolbar">
+
+        <button onclick="displayPageWrapper('match-information');">
+            <img src="assets/images/icon_matchInformation.png">
+        </button>
+        <br />
+
+        <button onclick="displayPageWrapper('betting');">
+            <img src="assets/images/icon_betting.png">
+        </button>
+        <br />
+
+        <button onclick="displayPageWrapper('registration');">
+            <img src="assets/images/icon_registration.png">
+        </button>
+
+    </div>
+
+    <div id="home" class="page-wrapper">
+
+        <h2>Welcome</h2>
+
+        <p>
+            Welcome to Tony's Casino.
+        </p>
+
+        <p>
+            Start by navigating with the taskbar.
+        </p>
+
+    </div>
+
+    <div id="match-information" class="page-wrapper">
+
+        <h2>Match Information</h2>
+
+        <p>
+            <div class="label">Event</div>
+            <input id="match-information-event" type="text">
+            <br />
+
+            <div class="label">Type</div>
+            <input id="match-information-type" type="text">
+            <br />
+
+            <div class="label">Number</div>
+            <input id="match-information-number" type="number">
+        </p>
+
+        <p>
+            <button onclick="registerMatch();">Register Match</button>
+        </p>
+
+        <p>
+            <div class="label">Blue Team</div>
+            <input id="match-information-b1" type="number">
+            <input id="match-information-b2" type="number">
+            <input id="match-information-b3" type="number">
+            <br />
+
+            <div class="label">Red Team</div>
+            <input id="match-information-r1" type="number">
+            <input id="match-information-r2" type="number">
+            <input id="match-information-r3" type="number">
+        </p>
+
+        <p>
+            <button class="blue-alliance-button" onclick="addMatchWinner('b');">Blue Alliance Won</button>
+            <button class="red-alliance-button" onclick="addMatchWinner('r');">Red Alliance Won</button>
+        </p>
+
+    </div>
+
+    <div id="betting" class="page-wrapper">
+
+        <h2>Betting</h2>
+
+        <p>
+            <div class="label">User ID</div>
+            <input id="betting-user-id" type="number">
+            <br />
+
+            <div class="label">Password</div>
+            <input id="betting-password" type="password">
+        </p>
+
+        <p>
+            <button class="blue-alliance-button" onclick="betAlliance('b');">Bet Blue Alliance</button>
+            <button class="red-alliance-button" onclick="betAlliance('r');">Bet Red Alliance</button>
+        </p>
+
+    </div>
+
+    <div id="registration" class="page-wrapper">
+
+        <h2>User Registration</h2>
+
+        <p>
+            <div class="label">User ID</div>
+            <input id="registration-user-id" type="number">
+            <br />
+
+            <div class="label">Password</div>
+            <input id="registration-password" type="password" placeholder="Don't re-use a password">
+            <br />
+
+            <div class="label">Verify Pswd</div>
+            <input id="registration-confirm-password" type="password">
+        </p>
+
+        <p>
+            <button onclick="registerAccount();">Create User</button>
+        </p>
+        
+    </div>
+
+    <div id="status-box" class="init-fade">Status</div>
+
+    <script src="dom.js"></script>
+    <script src="display.js"></script>
+    <script src="db.js"></script>
+    <script src="index.js"></script>
+    <script>
+
+        displayPageWrapper("home");
+        createLocalStorageDatabase();
+
+    </script>
+
+</body>
+
+</html>
