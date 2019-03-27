@@ -1,6 +1,4 @@
 
-const sha256 = require('js-sha256');
-
 function getMatchId() {
 
     var event = matchInformationEvent.value;
@@ -224,6 +222,11 @@ function betAlliance(alliance) {
     if (amount > user['tokens']) {
 
         displayStatusMessage('Cannot bet more than your net worth');
+        return;
+    }
+    if (amount < 0) {
+
+        displayStatusMessage('Cannot bet a negative amount');
         return;
     }
 

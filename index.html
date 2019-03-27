@@ -43,6 +43,10 @@
             Start by navigating with the taskbar.
         </p>
 
+        <p>
+            <button onclick="eraseLocalStorageDatabase();">Erase All Data</button>
+        </p>
+
     </div>
 
     <div id="match-information" class="page-wrapper">
@@ -152,6 +156,7 @@
 
     <div id="status-box" class="init-fade">Status</div>
 
+    <script>const sha256 = require('js-sha256');</script>
     <script src="funcs.js"></script>
     <script src="dom.js"></script>
     <script src="display.js"></script>

@@ -1,4 +1,13 @@
 
+function eraseLocalStorageDatabase() {
+    
+    localStorage.setItem('users', '[]');
+    localStorage.setItem('matches', '[]');
+    localStorage.setItem('bets', '[]');
+
+    displayStatusMessage('Erased all data.');
+}
+
 function createLocalStorageDatabase() {
 
     if (!localStorage.getItem('users')) {
