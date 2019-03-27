@@ -25,6 +25,10 @@
             <img src="assets/images/icon_registration.png">
         </button>
 
+        <button onclick="displayPageWrapper('leaderboard'); displayLeaderboard();">
+            <img src="assets/images/icon_leaderboard.png">
+        </button>
+
     </div>
 
     <div id="home" class="page-wrapper">
@@ -93,6 +97,10 @@
 
             <div class="label">Password</div>
             <input id="betting-password" type="password">
+            <br />
+
+            <div class="label">Bet Amount</div>
+            <input id="betting-amount" type="number">
         </p>
 
         <p>
@@ -125,8 +133,26 @@
         
     </div>
 
+    <div id="leaderboard" class="page-wrapper">
+
+        <h2>Leaderboard</h2>
+
+        <table id="leaderboard-table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        </table>
+        
+    </div>
+
     <div id="status-box" class="init-fade">Status</div>
 
+    <script src="funcs.js"></script>
     <script src="dom.js"></script>
     <script src="display.js"></script>
     <script src="db.js"></script>

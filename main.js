@@ -15,8 +15,8 @@ app.on('ready', function() {
         height: 300
     });
 
-    win.setMenu(null);
-    win.setResizable(false);
+    //win.setMenu(null);
+    //win.setResizable(false);
 
     win.loadURL(url.format({
         pathname: path.join(__dirname, "index.html"),

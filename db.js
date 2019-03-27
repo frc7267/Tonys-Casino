@@ -14,7 +14,7 @@ function createLocalStorageDatabase() {
     }
 }
 
-function addObjectToTable(name, parameters) {
+function addObjectToTable(name, object) {
 
     var json = localStorage.getItem(name);
 
@@ -26,7 +26,7 @@ function addObjectToTable(name, parameters) {
         json += ",";
     }
 
-    json += parameters + "]";
+    json += object + "]";
 
     localStorage.setItem(name, json);
 }

@@ -21,3 +21,6 @@ const matchInformationR3 = document.querySelector('#match-information-r3');
 
 const bettingUserId   = document.querySelector('#betting-user-id');
 const bettingPassword = document.querySelector('#betting-password');
+const bettingAmount   = document.querySelector('#betting-amount');
+
+const leaderboardTable = document.querySelector('#leaderboard-table');

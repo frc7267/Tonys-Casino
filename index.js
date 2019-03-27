@@ -8,7 +8,7 @@ function getMatchId() {
     var number = parseInt(matchInformationNumber.value);
 
     // check for valid input
-    if (event === "" || type === "" || !Number.isInteger(number)) {
+    if (event === "" || type === "" || !isIdNumber(number)) {
         return null;
     }
 
@@ -22,11 +22,11 @@ function registerAccount() {
     var confirmPasswordSha = sha256(registrationConfirmPassword.value);
 
     // validate input
-    if (!Number.isInteger(userId) ||
+    if (!isIdNumber(userId) ||
         registrationPassword.value === "" ||
         registrationConfirmPassword.value === "") {
 
-        displayStatusMessage('Missing fields.');
+        displayStatusMessage('Missing or invalid fields.');
         return;
     }
 
@@ -44,9 +44,11 @@ function registerAccount() {
         return;
     }
 
+    var numTokens = 1000;
     var jsonObj =
         '{"user-id":' + userId + ',' +
-        '"password":"' + passwordSha + '"}';
+        '"password":"' + passwordSha + '",' +
+        '"tokens":' + numTokens + '}';
 
     addObjectToTable('users', jsonObj);
     displayStatusMessage('Created user ' + userId + '.');
@@ -59,7 +61,7 @@ function registerMatch() {
     // validate input
     if (!matchId) {
 
-        displayStatusMessage('Missing fields.');
+        displayStatusMessage('Missing or invalid fields.');
         return;
     }
 
@@ -96,10 +98,10 @@ function addMatchWinner(winner) {
 
     // validate input
     if (!matchId ||
-        !Number.isInteger(b1) || !Number.isInteger(b2) || !Number.isInteger(b3) ||
-        !Number.isInteger(r1) || !Number.isInteger(r2) || !Number.isInteger(r3)) {
+        !isIdNumber(b1) || !isIdNumber(b2) || !isIdNumber(b3) ||
+        !isIdNumber(r1) || !isIdNumber(r2) || !isIdNumber(r3)) {
 
-        displayStatusMessage('Missing fields.');
+        displayStatusMessage('Missing or invalid fields.');
         return;
     }
 
@@ -110,20 +112,55 @@ function addMatchWinner(winner) {
         return;
     }
 
-    var matchObj = getObjectsFromTable('matches', 'match-id', matchId)[0];
+    var match = getObjectsFromTable('matches', 'match-id', matchId)[0];
 
-    matchObj['b1'] = b1;
-    matchObj['b2'] = b2;
-    matchObj['b3'] = b3;
-    matchObj['r1'] = r1;
-    matchObj['r2'] = r2;
-    matchObj['r3'] = r3;
-    matchObj['winner'] = winner;
+    // exit of winner already defined
+    if (match['winner'] !== 'u') {
+
+        displayStatusMessage('Match winner already set.');
+        return;
+    }
+
+    match['b1'] = b1;
+    match['b2'] = b2;
+    match['b3'] = b3;
+    match['r1'] = r1;
+    match['r2'] = r2;
+    match['r3'] = r3;
+    match['winner'] = winner;
+
+    var teamNames = { r: "Red team", b: "Blue team" };
+    displayStatusMessage('Match winner set to ' + teamNames[winner]);
 
     // update match
     removeObjectsFromTable('matches', 'match-id', matchId);
     setTimeout(function() { // timeout insures that the adding the object comes after removing the object
-        addObjectToTable('matches', JSON.stringify(matchObj));
+        addObjectToTable('matches', JSON.stringify(match));
+    }, 0);
+
+    // update user tokens
+    var bets = getObjectsFromTable('bets', 'match-id', matchId);
+    var newUsers = [];
+    for (var i = 0; i < bets.length; i++) {
+
+        var bet = bets[i];
+        var user = getObjectsFromTable('users', 'user-id', bet['user-id'])[0];
+
+        if (bet['betting-alliance'] === winner) {
+            user['tokens'] += bet['bet-amount'];
+        }
+        else {
+            user['tokens'] -= bet['bet-amount'];
+        }
+
+        newUsers.push(JSON.stringify(user));
+
+        removeObjectsFromTable('users', 'user-id', user['user-id']);
+    }
+    setTimeout(function() { // timeout insures that the adding the object comes after removing the object
+        for (var i = 0; i < newUsers.length; i++) {
+            addObjectToTable('users', newUsers[i]);
+        }
     }, 0);
 }
 
@@ -132,6 +169,7 @@ function betAlliance(alliance) {
     var matchId     = getMatchId();
     var userId      = parseInt(bettingUserId.value);
     var passwordSha = sha256(bettingPassword.value);
+    var amount      = parseInt(bettingAmount.value);
 
     // validate input
     if (!matchId) {
@@ -139,10 +177,11 @@ function betAlliance(alliance) {
         displayStatusMessage('Invalid match information.');
         return;
     }
-    if (!Number.isInteger(userId) ||
-        bettingPassword.value === "") {
+    if (!isIdNumber(userId) ||
+        bettingPassword.value === "" ||
+        !Number.isInteger(amount)) {
 
-        displayStatusMessage('Missing fields.');
+        displayStatusMessage('Missing or invalid fields.');
         return;
     }
 
@@ -153,9 +192,11 @@ function betAlliance(alliance) {
         return;
     }
 
+    // get user
+    var user = getObjectsFromTable('users', 'user-id', userId)[0];
+
     // check for password match
-    var userObj = getObjectsFromTable('users', 'user-id', userId)[0];
-    if (passwordSha !== userObj['password']) {
+    if (passwordSha !== user['password']) {
 
         displayStatusMessage('Invalid login credentials.');
         return;
@@ -169,21 +210,54 @@ function betAlliance(alliance) {
     }
 
     // check for double betting
-    var betObjs = getObjectsFromTable('bets', 'match-id', matchId);
-    for (var i = 0; i < betObjs.length; i++) {
+    var bets = getObjectsFromTable('bets', 'match-id', matchId);
+    for (var i = 0; i < bets.length; i++) {
 
-        if (betObjs[i]['user-id'] === userId) {
+        if (bets[i]['user-id'] === userId) {
 
             displayStatusMessage('Cannot bet twice on the same match.');
             return;
         }
     }
 
+    // check for valid amount of tokens
+    if (amount > user['tokens']) {
+
+        displayStatusMessage('Cannot bet more than your net worth');
+        return;
+    }
+
     var jsonObj =
         '{"user-id":' + userId + ',' +
         '"match-id":"' + matchId + '",' +
-        '"betting-alliance":"' + alliance + '"}';
+        '"betting-alliance":"' + alliance + '",' +
+        '"bet-amount":' + amount + '}';
     
     addObjectToTable('bets', jsonObj);
     displayStatusMessage('Created bet for user ' + userId + ' and alliance ' + alliance + '.');
+}
+
+function sortLeaderboard() {
+
+    var table = getTable('users');
+    table.sort(function(a, b) {
+
+        return b['tokens'] - a['tokens'];
+    });
+
+    localStorage.setItem('users', JSON.stringify(table));
+}
+
+function displayLeaderboard() {
+
+    sortLeaderboard();
+
+    var users = getTable('users');
+    var tbody = leaderboardTable.querySelector('tbody');
+
+    tbody.innerHTML = "";
+    for (var i = 0; i < users.length; i++) {
+
+        tbody.innerHTML += '<tr><td>' + users[i]['user-id'] + '</td><td>' + users[i]['tokens'] + '</td></tr>';
+    }
 }

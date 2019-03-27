@@ -51,6 +51,18 @@ body {
 
 }
 
+table {
+
+    border-collapse: collapse;
+
+    border: 2px solid #e0e0e0;
+}
+
+table td, table th {
+
+    border: 1px solid #e0e0e0;
+}
+
 input {
 
     margin-left: 32px;
@@ -161,6 +173,11 @@ button:hover {
 
     opacity: 0;
     transition: 0.7s;
+}
+
+#leaderboard-table {
+
+    width: 100%;
 }
 
 .page-wrapper {
